@@ -19,6 +19,7 @@ import {
 import { useCampaignOptions, useSaveFormA } from '../../hooks/api';
 import { EditIconButton } from '../../../../../../../../../hat/assets/js/apps/Iaso/components/Buttons/EditIconButton';
 import { useFormAValidation } from './validation';
+import { PhoneInput } from '../../../../../components/Inputs/PhoneInput';
 
 type Props = {
     formA?: any;
@@ -52,6 +53,8 @@ export const CreateEditFormA: FunctionComponent<Props> = ({
             unusable_vials: formA?.unusable_vials,
             missing_vials: formA?.missing_vials,
             vaccine_stock: vaccineStockId,
+            phone: undefined,
+            country: undefined,
         },
         onSubmit: values => save(values),
         validationSchema,
@@ -63,7 +66,7 @@ export const CreateEditFormA: FunctionComponent<Props> = ({
         titleMessage,
     )} ${formatMessage(MESSAGES.formA)}`;
     const allowConfirm = formik.isValid && !isEqual(formik.touched, {});
-
+    console.log('FORMIK', formik.values);
     return (
         <FormikProvider value={formik}>
             <ConfirmCancelModal
@@ -81,6 +84,21 @@ export const CreateEditFormA: FunctionComponent<Props> = ({
                 confirmMessage={MESSAGES.save}
                 cancelMessage={MESSAGES.cancel}
             >
+                <Box mb={2} mt={2}>
+                    <Field
+                        label={formatMessage(MESSAGES.forma_unusable_vials)}
+                        name="phone"
+                        component={PhoneInput}
+                        countryDataField="country"
+                        required
+                        // disabled
+                        phoneInputOptions={{
+                            onlyCountries: ['fr', 'be'],
+                            country: 'fr', // country should be specified because we have no empty flag
+                            // lang: 'pt',
+                        }}
+                    />
+                </Box>
                 <Box mb={2}>
                     <Field
                         label={formatMessage(MESSAGES.campaign)}
