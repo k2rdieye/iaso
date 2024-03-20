@@ -27,43 +27,27 @@ import {
     dateRangePickerToDateApi,
 } from '../../../../../../../hat/assets/js/apps/Iaso/utils/dates';
 import { appId } from '../../../constants/app';
-import { CalendarParams } from './types';
-import { useGetCampaignTypes } from '../../Campaigns/hooks/api/useGetCampaignTypes';
+import { CampaignListParams } from '../../../constants/types';
+import { useGetCampaignTypes } from '../hooks/api/useGetCampaignTypes';
 
 type Props = {
-    router: Router & { params: CalendarParams };
-    disableDates?: boolean;
-    disableOnlyDeleted?: boolean;
-    isCalendar?: boolean;
-    showTest?: boolean;
+    router: Router & { params: CampaignListParams };
 };
 
 const campaignCategoryOptions = (
     // eslint-disable-next-line no-unused-vars
     formatMessage: IntlFormatMessage,
-    showTest = false,
 ) => {
     const options = [
         { label: formatMessage(MESSAGES.all), value: 'all' },
         { label: formatMessage(MESSAGES.preventiveShort), value: 'preventive' },
         { label: formatMessage(MESSAGES.regular), value: 'regular' },
+        { label: formatMessage(MESSAGES.testCampaign), value: 'test' },
     ];
-    if (showTest) {
-        return [
-            ...options,
-            { label: formatMessage(MESSAGES.testCampaign), value: 'test' },
-        ];
-    }
     return options;
 };
 
-export const CampaignsFilters: FunctionComponent<Props> = ({
-    router,
-    disableDates = false,
-    disableOnlyDeleted = false,
-    isCalendar = false,
-    showTest = false,
-}) => {
+export const CampaignsFilters: FunctionComponent<Props> = ({ router }) => {
     const { formatMessage } = useSafeIntl();
     const { params } = router;
     const [filtersUpdated, setFiltersUpdated] = useState(false);
@@ -203,21 +187,19 @@ export const CampaignsFilters: FunctionComponent<Props> = ({
                         options={groupedOrgUnits}
                         label={MESSAGES.countryBlock}
                     />
-                    {!isCalendar && (
-                        <InputComponent
-                            loading={isFetchingGroupedGroups}
-                            keyValue="campaignGroups"
-                            clearable
-                            multi
-                            onChange={(_key, value) => {
-                                setCampaignGroups(value);
-                            }}
-                            value={campaignGroups}
-                            type="select"
-                            options={groupedCampaignsOptions}
-                            label={MESSAGES.groupedCampaigns}
-                        />
-                    )}
+                    <InputComponent
+                        loading={isFetchingGroupedGroups}
+                        keyValue="campaignGroups"
+                        clearable
+                        multi
+                        onChange={(_key, value) => {
+                            setCampaignGroups(value);
+                        }}
+                        value={campaignGroups}
+                        type="select"
+                        options={groupedCampaignsOptions}
+                        label={MESSAGES.groupedCampaigns}
+                    />
                 </Grid>
                 <Grid item xs={12} md={3}>
                     <InputComponent
@@ -229,10 +211,7 @@ export const CampaignsFilters: FunctionComponent<Props> = ({
                         }}
                         value={campaignCategory}
                         type="select"
-                        options={campaignCategoryOptions(
-                            formatMessage,
-                            showTest,
-                        )}
+                        options={campaignCategoryOptions(formatMessage)}
                         label={MESSAGES.campaignCategory}
                     />
                     <InputComponent
@@ -248,98 +227,53 @@ export const CampaignsFilters: FunctionComponent<Props> = ({
                         options={types}
                         label={MESSAGES.campaignType}
                     />
-                    {!isCalendar && (
-                        <InputComponent
-                            loading={isFetchingCountries}
-                            keyValue="countries"
-                            multi
-                            clearable
-                            onChange={(key, value) => {
-                                setCountries(value);
-                            }}
-                            value={countries}
-                            type="select"
-                            options={countriesList.map(c => ({
-                                label: c.name,
-                                value: c.id,
-                            }))}
-                            label={MESSAGES.country}
-                        />
-                    )}
+                    <InputComponent
+                        loading={isFetchingCountries}
+                        keyValue="countries"
+                        multi
+                        clearable
+                        onChange={(key, value) => {
+                            setCountries(value);
+                        }}
+                        value={countries}
+                        type="select"
+                        options={countriesList.map(c => ({
+                            label: c.name,
+                            value: c.id,
+                        }))}
+                        label={MESSAGES.country}
+                    />
                 </Grid>
                 <Grid item xs={12} md={3}>
-                    {!disableDates && (
-                        <DatesRange
-                            xs={12}
-                            sm={12}
-                            md={12}
-                            lg={12}
-                            onChangeDate={(key, value) => {
-                                if (key === 'dateFrom') {
-                                    setRoundStartFrom(value);
-                                }
-                                if (key === 'dateTo') {
-                                    setRoundStartTo(value);
-                                }
-                            }}
-                            labelFrom={MESSAGES.RoundStartFrom}
-                            labelTo={MESSAGES.RoundStartTo}
-                            dateFrom={roundStartFrom || undefined}
-                            dateTo={roundStartTo || undefined}
-                        />
-                    )}
-                    {isCalendar && (
-                        <>
-                            <InputComponent
-                                loading={isFetchingGroupedGroups}
-                                keyValue="campaignGroups"
-                                clearable
-                                multi
-                                onChange={(_key, value) => {
-                                    setCampaignGroups(value);
-                                }}
-                                value={campaignGroups}
-                                type="select"
-                                options={groupedCampaignsOptions}
-                                label={MESSAGES.groupedCampaigns}
-                            />
-                            <InputComponent
-                                loading={isFetchingCountries}
-                                keyValue="countries"
-                                multi
-                                clearable
-                                onChange={(key, value) => {
-                                    setCountries(value);
-                                }}
-                                value={countries}
-                                type="select"
-                                options={countriesList.map(c => ({
-                                    label: c.name,
-                                    value: c.id,
-                                }))}
-                                label={MESSAGES.country}
-                            />
-                        </>
-                    )}
-                    {!disableOnlyDeleted && (
-                        <InputComponent
-                            keyValue="showOnlyDeleted"
-                            onChange={(key, value) => {
-                                setShowOnlyDeleted(value);
-                            }}
-                            value={showOnlyDeleted}
-                            type="checkbox"
-                            label={MESSAGES.showOnlyDeleted}
-                        />
-                    )}
+                    <DatesRange
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={12}
+                        onChangeDate={(key, value) => {
+                            if (key === 'dateFrom') {
+                                setRoundStartFrom(value);
+                            }
+                            if (key === 'dateTo') {
+                                setRoundStartTo(value);
+                            }
+                        }}
+                        labelFrom={MESSAGES.RoundStartFrom}
+                        labelTo={MESSAGES.RoundStartTo}
+                        dateFrom={roundStartFrom || undefined}
+                        dateTo={roundStartTo || undefined}
+                    />
+                    <InputComponent
+                        keyValue="showOnlyDeleted"
+                        onChange={(key, value) => {
+                            setShowOnlyDeleted(value);
+                        }}
+                        value={showOnlyDeleted}
+                        type="checkbox"
+                        label={MESSAGES.showOnlyDeleted}
+                    />
                 </Grid>
-                <Grid
-                    container
-                    item
-                    xs={12}
-                    md={!disableDates || isCalendar ? 3 : 6}
-                    justifyContent="flex-end"
-                >
+                <Grid container item xs={12} md={6} justifyContent="flex-end">
                     <Box mt={isLargeLayout ? 2 : 0}>
                         <Button
                             disabled={textSearchError || !filtersUpdated}

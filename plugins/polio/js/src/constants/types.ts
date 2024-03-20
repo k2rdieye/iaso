@@ -2,6 +2,7 @@ import { IntlFormatMessage, Pagination } from 'bluesquare-components';
 import { Nullable } from '../../../../../hat/assets/js/apps/Iaso/types/utils';
 import { Profile } from '../../../../../hat/assets/js/apps/Iaso/utils/usersUtils';
 import { ReasonForDelay } from '../domains/Campaigns/Rounds/ReasonForDelayModal/hooks/reasons';
+import { CampaignCategory } from '../domains/Campaigns/hooks/api/useGetCampaigns';
 
 /* eslint-disable camelcase */
 export type FormatForNFMArgs<T> = {
@@ -463,4 +464,20 @@ export type CampaignListItem = {
     general_status: string;
     grouped_campaigns: number[];
     campaign_types: CampaignType[];
+};
+export type CampaignListParams = {
+    roundStartFrom?: string;
+    roundStartTo?: string;
+    showOnlyDeleted?: string;
+    // eslint-disable-next-line camelcase
+    show_test?: string;
+    filterLaunched?: string;
+    order?: string;
+    countries?: string;
+    search?: string;
+    campaignType?: string;
+    campaignCategory?: CampaignCategory;
+    campaignGroups?: string;
+    orgUnitGroups?: string;
+    currentDate?: string;
 };

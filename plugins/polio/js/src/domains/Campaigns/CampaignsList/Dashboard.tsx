@@ -10,7 +10,6 @@ import { Router } from '../../../../../../../hat/assets/js/apps/Iaso/types/gener
 import MESSAGES from '../../../constants/messages';
 import { DASHBOARD_BASE_URL } from '../../../constants/routes';
 import { useStyles } from '../../../styles/theme';
-import { CampaignsFilters } from '../../Calendar/campaignCalendar/CampaignsFilters';
 import {
     Options as GetCampaignOptions,
     useCampaignParams,
@@ -19,6 +18,7 @@ import {
 } from '../hooks/api/useGetCampaigns';
 import { useRemoveCampaign } from '../hooks/api/useRemoveCampaign';
 import { useRestoreCampaign } from '../hooks/api/useRestoreCampaign';
+import { CampaignsFilters } from './CampaignsFilters';
 import { DashboardButtons } from './DashboardButtons';
 import { useCampaignsTableColumns } from './useCampaignsTableColumns';
 
@@ -80,7 +80,7 @@ const Dashboard: FunctionComponent<Props> = ({ router }) => {
                 displayBackButton={false}
             />
             <Box className={classes.containerFullHeightNoTabPadded}>
-                <CampaignsFilters showTest router={router} />
+                <CampaignsFilters router={router} />
                 <Box mb={2}>
                     <DashboardButtons
                         router={router}

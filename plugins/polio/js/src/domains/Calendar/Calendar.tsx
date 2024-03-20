@@ -30,7 +30,7 @@ import { useCurrentUser } from '../../../../../../hat/assets/js/apps/Iaso/utils/
 import MESSAGES from '../../constants/messages';
 import { useGetCampaigns } from '../Campaigns/hooks/api/useGetCampaigns';
 import { ExportCsvModal } from './ExportCsvModal';
-import { CampaignsFilters } from './campaignCalendar/CampaignsFilters';
+import { CalendarFilters } from './campaignCalendar/CalendarFilters';
 import { dateFormat, defaultOrder } from './campaignCalendar/constants';
 import {
     CalendarParams,
@@ -205,12 +205,7 @@ export const Calendar: FunctionComponent<Props> = ({ params, router }) => {
                 >
                     {!isPdf && (
                         <Box mb={4}>
-                            <CampaignsFilters
-                                disableDates
-                                disableOnlyDeleted
-                                isCalendar
-                                router={router}
-                            />
+                            <CalendarFilters router={router} />
                         </Box>
                     )}
                     <Grid
