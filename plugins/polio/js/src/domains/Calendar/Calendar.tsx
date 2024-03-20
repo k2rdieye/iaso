@@ -28,6 +28,7 @@ import { userHasPermission } from '../../../../../../hat/assets/js/apps/Iaso/dom
 import { Router } from '../../../../../../hat/assets/js/apps/Iaso/types/general';
 import { useCurrentUser } from '../../../../../../hat/assets/js/apps/Iaso/utils/usersUtils';
 import MESSAGES from '../../constants/messages';
+import { useGetCampaignTypes } from '../Campaigns/hooks/api/useGetCampaignTypes';
 import { useGetCampaigns } from '../Campaigns/hooks/api/useGetCampaigns';
 import { ExportCsvModal } from './ExportCsvModal';
 import { CalendarFilters } from './campaignCalendar/CalendarFilters';
@@ -69,6 +70,7 @@ export const Calendar: FunctionComponent<Props> = ({ params, router }) => {
         Boolean(state.users.current),
     );
     const orders = params.order || defaultOrder;
+    const { data: campaignTypes } = useGetCampaignTypes();
     const queryOptions = useMemo(
         () => ({
             order: orders,
@@ -203,9 +205,12 @@ export const Calendar: FunctionComponent<Props> = ({ params, router }) => {
                         isPdf && classes.isPdf,
                     )}
                 >
-                    {!isPdf && (
+                    {!isPdf && campaignTypes && (
                         <Box mb={4}>
-                            <CalendarFilters router={router} />
+                            <CalendarFilters
+                                router={router}
+                                campaignTypes={campaignTypes}
+                            />
                         </Box>
                     )}
                     <Grid

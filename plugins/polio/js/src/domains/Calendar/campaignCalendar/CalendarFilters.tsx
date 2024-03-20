@@ -21,12 +21,13 @@ import { useGetCountries } from '../../../hooks/useGetCountries';
 import { useGetGroupedCampaigns } from '../../GroupedCampaigns/hooks/useGetGroupedCampaigns';
 
 import { genUrl } from '../../../../../../../hat/assets/js/apps/Iaso/routing/routing';
+import { DropdownOptions } from '../../../../../../../hat/assets/js/apps/Iaso/types/utils';
 import { appId } from '../../../constants/app';
-import { useGetCampaignTypes } from '../../Campaigns/hooks/api/useGetCampaignTypes';
 import { CalendarParams } from './types';
 
 type Props = {
     router: Router & { params: CalendarParams };
+    campaignTypes: DropdownOptions<number>[];
 };
 
 const campaignCategoryOptions = (
@@ -41,13 +42,23 @@ const campaignCategoryOptions = (
     return options;
 };
 
-export const CalendarFilters: FunctionComponent<Props> = ({ router }) => {
+const getPolioType = (campaignTypes: DropdownOptions<number>[]) => {
+    return campaignTypes.find(type => type.label.toLowerCase() === 'polio');
+};
+
+export const CalendarFilters: FunctionComponent<Props> = ({
+    router,
+    campaignTypes,
+}) => {
     const { formatMessage } = useSafeIntl();
+    const polioType = getPolioType(campaignTypes);
     const { params } = router;
     const [filtersUpdated, setFiltersUpdated] = useState(false);
     const [countries, setCountries] = useState(params.countries);
     const [orgUnitGroups, setOrgUnitGroups] = useState(params.orgUnitGroups);
-    const [campaignType, setCampaignType] = useState(params.campaignType);
+    const [campaignType, setCampaignType] = useState(
+        params.campaignType || polioType,
+    );
     const [campaignCategory, setCampaignCategory] = useState(
         params.campaignCategory,
     );
@@ -92,7 +103,6 @@ export const CalendarFilters: FunctionComponent<Props> = ({ router }) => {
         dispatch,
     ]);
     const { data, isFetching: isFetchingCountries } = useGetCountries();
-    const { data: types, isFetching: isFetchingTypes } = useGetCampaignTypes();
     const { data: groupedCampaigns, isFetching: isFetchingGroupedGroups } =
         useGetGroupedCampaigns();
     // Pass the appId to have it works in the embedded calendar where the user is not connected
@@ -171,7 +181,6 @@ export const CalendarFilters: FunctionComponent<Props> = ({ router }) => {
                         label={MESSAGES.campaignCategory}
                     />
                     <InputComponent
-                        loading={isFetchingTypes}
                         keyValue="campaignType"
                         clearable
                         onChange={(_key, value) => {
@@ -180,7 +189,7 @@ export const CalendarFilters: FunctionComponent<Props> = ({ router }) => {
                         multi
                         value={campaignType}
                         type="select"
-                        options={types}
+                        options={campaignTypes}
                         label={MESSAGES.campaignType}
                     />
                 </Grid>
