@@ -65,6 +65,7 @@ export type CalendarParams = {
     campaignGroups?: string;
     orgUnitGroups?: string;
     currentDate?: string;
+    accountId?: string;
 };
 
 export type CalendarData = {

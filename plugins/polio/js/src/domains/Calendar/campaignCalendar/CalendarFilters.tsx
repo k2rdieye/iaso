@@ -42,23 +42,16 @@ const campaignCategoryOptions = (
     return options;
 };
 
-const getPolioType = (campaignTypes: DropdownOptions<number>[]) => {
-    return campaignTypes.find(type => type.label.toLowerCase() === 'polio');
-};
-
 export const CalendarFilters: FunctionComponent<Props> = ({
     router,
     campaignTypes,
 }) => {
     const { formatMessage } = useSafeIntl();
-    const polioType = getPolioType(campaignTypes);
     const { params } = router;
     const [filtersUpdated, setFiltersUpdated] = useState(false);
     const [countries, setCountries] = useState(params.countries);
     const [orgUnitGroups, setOrgUnitGroups] = useState(params.orgUnitGroups);
-    const [campaignType, setCampaignType] = useState(
-        params.campaignType || polioType,
-    );
+    const [campaignType, setCampaignType] = useState(params.campaignType);
     const [campaignCategory, setCampaignCategory] = useState(
         params.campaignCategory,
     );

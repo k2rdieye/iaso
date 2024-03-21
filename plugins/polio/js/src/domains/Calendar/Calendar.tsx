@@ -26,9 +26,9 @@ import {
 
 import { userHasPermission } from '../../../../../../hat/assets/js/apps/Iaso/domains/users/utils';
 import { Router } from '../../../../../../hat/assets/js/apps/Iaso/types/general';
+import { DropdownOptions } from '../../../../../../hat/assets/js/apps/Iaso/types/utils';
 import { useCurrentUser } from '../../../../../../hat/assets/js/apps/Iaso/utils/usersUtils';
 import MESSAGES from '../../constants/messages';
-import { useGetCampaignTypes } from '../Campaigns/hooks/api/useGetCampaignTypes';
 import { useGetCampaigns } from '../Campaigns/hooks/api/useGetCampaigns';
 import { ExportCsvModal } from './ExportCsvModal';
 import { CalendarFilters } from './campaignCalendar/CalendarFilters';
@@ -42,6 +42,7 @@ import {
 type Props = {
     params: CalendarParams;
     router: Router;
+    campaignTypes: DropdownOptions<number>[];
 };
 
 const pageWidth = 1980;
@@ -63,14 +64,17 @@ const useStyles = makeStyles(theme => ({
     exportIcon: { marginRight: '8px' },
 }));
 
-export const Calendar: FunctionComponent<Props> = ({ params, router }) => {
+export const Calendar: FunctionComponent<Props> = ({
+    params,
+    router,
+    campaignTypes,
+}) => {
     const { formatMessage } = useSafeIntl();
     const classes = useStyles();
     const isLogged = useSelector((state: ReduxState) =>
         Boolean(state.users.current),
     );
     const orders = params.order || defaultOrder;
-    const { data: campaignTypes } = useGetCampaignTypes();
     const queryOptions = useMemo(
         () => ({
             order: orders,
