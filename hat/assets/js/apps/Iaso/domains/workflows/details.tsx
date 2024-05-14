@@ -19,14 +19,12 @@ import {
 import { isEqual } from 'lodash';
 import { Box, Grid, Button } from '@mui/material';
 import { makeStyles } from '@mui/styles';
-import { useDispatch } from 'react-redux';
 import orderBy from 'lodash/orderBy';
 import uniqWith from 'lodash/uniqWith';
 import TopBar from '../../components/nav/TopBarComponent';
 import MESSAGES from './messages';
 
-import { useGoBack } from '../../routing/useGoBack';
-import { redirectToReplace } from '../../routing/actions';
+import { useGoBack } from '../../routing/hooks/useGoBack';
 import { baseUrls } from '../../constants/urls';
 
 import { useGetWorkflowVersion } from './hooks/requests/useGetWorkflowVersions';
@@ -56,14 +54,7 @@ import { useGetChangesColumns } from './config/changes';
 import { useGetFollowUpsColumns, iasoFields } from './config/followUps';
 import { useGetPossibleFieldsByFormVersion } from '../forms/hooks/useGetPossibleFields';
 import { PossibleField } from '../forms/types/forms';
-
-type Router = {
-    goBack: () => void;
-    params: WorkflowParams;
-};
-type Props = {
-    router: Router;
-};
+import { useParamsObject } from '../../routing/hooks/useParamsObject';
 
 const useStyles = makeStyles(theme => ({
     ...commonStyles(theme),
@@ -82,8 +73,8 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-export const Details: FunctionComponent<Props> = ({ router }) => {
-    const { params } = router;
+export const Details: FunctionComponent = () => {
+    const params = useParamsObject(baseUrls.workflowDetail) as WorkflowParams;
     const classes: Record<string, string> = useStyles();
     const [followUps, setFollowUps] = useState<FollowUps[]>([]);
 
@@ -94,9 +85,9 @@ export const Details: FunctionComponent<Props> = ({ router }) => {
         useState<boolean>(false);
     const { entityTypeId, versionId } = params;
     const { formatMessage } = useSafeIntl();
-    const goBack = useGoBack(router, baseUrls.workflows, { entityTypeId });
-
-    const dispatch = useDispatch();
+    const goBack = useGoBack(
+        `${baseUrls.workflows}/entityTypeId/${entityTypeId}`,
+    );
 
     const {
         data: workflowVersion,
@@ -313,14 +304,6 @@ export const Details: FunctionComponent<Props> = ({ router }) => {
                             columns={changesColumns}
                             count={changes?.length}
                             params={params}
-                            onTableParamsChange={p =>
-                                dispatch(
-                                    redirectToReplace(
-                                        baseUrls.workflowDetail,
-                                        p,
-                                    ),
-                                )
-                            }
                             extraProps={{
                                 isLoading,
                                 targetPossibleFieldsByVersion,

@@ -6,8 +6,7 @@ import {
     useSafeIntl,
 } from 'bluesquare-components';
 import { orderBy } from 'lodash';
-import React, { FunctionComponent, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { FunctionComponent, useCallback, useMemo } from 'react';
 import TopBar from '../../components/nav/TopBarComponent';
 import MESSAGES from './messages';
 
@@ -24,33 +23,22 @@ import { Instances } from './components/Instances';
 import { OrgUnitInstances } from './components/OrgUnitInstances';
 import { OrgUnitPaper } from './components/OrgUnitPaper';
 import { OrgunitTypeRegistry } from './types/orgunitTypes';
-
 import { RegistryDetailParams } from './types';
-
-import { redirectTo } from '../../routing/actions';
 import { OrgUnitTreeviewModal } from '../orgUnits/components/TreeView/OrgUnitTreeviewModal';
 import { OrgUnitBreadcrumbs } from '../orgUnits/components/breadcrumbs/OrgUnitBreadcrumbs';
 import { OrgUnit } from '../orgUnits/types/orgUnit';
-
-type Router = {
-    goBack: () => void;
-    params: RegistryDetailParams;
-};
-type Props = {
-    router: Router;
-};
+import { useParamsObject } from '../../routing/hooks/useParamsObject';
+import { useRedirectTo } from '../../routing/routing';
 
 const useStyles = makeStyles(theme => ({
     ...commonStyles(theme),
 }));
 
-export const Registry: FunctionComponent<Props> = ({ router }) => {
-    const {
-        params: { orgUnitId },
-        params,
-    } = router;
-    const dispatch = useDispatch();
+export const Registry: FunctionComponent = () => {
     const classes: Record<string, string> = useStyles();
+    const params = useParamsObject(baseUrls.registry) as RegistryDetailParams;
+    const redirectTo = useRedirectTo();
+    const { orgUnitId } = params;
     const { formatMessage } = useSafeIntl();
 
     const { data: orgUnit, isFetching } = useGetOrgUnit(orgUnitId);
@@ -80,15 +68,18 @@ export const Registry: FunctionComponent<Props> = ({ router }) => {
         return orderBy(options, [f => f.depth], ['asc']);
     }, [orgUnit, orgUnitMapChildren]);
 
-    const handleOrgUnitChange = (newOrgUnit: OrgUnit) => {
-        if (newOrgUnit) {
-            const newParams = {
-                ...params,
-                orgUnitId: `${newOrgUnit.id}`,
-            };
-            dispatch(redirectTo(`/${baseUrls.registry}`, newParams));
-        }
-    };
+    const handleOrgUnitChange = useCallback(
+        (newOrgUnit: OrgUnit) => {
+            if (newOrgUnit) {
+                const newParams = {
+                    ...params,
+                    orgUnitId: `${newOrgUnit.id}`,
+                };
+                redirectTo(`/${baseUrls.registry}`, newParams);
+            }
+        },
+        [params, redirectTo],
+    );
 
     return (
         <>

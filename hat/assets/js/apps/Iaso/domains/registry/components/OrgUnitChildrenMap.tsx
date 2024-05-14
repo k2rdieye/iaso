@@ -14,7 +14,6 @@ import React, {
 } from 'react';
 import { GeoJSON, MapContainer, Pane, ScaleControl } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
-import { useDispatch } from 'react-redux';
 import {
     circleColorMarkerOptions,
     colorClusterCustomMarker,
@@ -39,11 +38,11 @@ import { CustomTileLayer } from '../../../components/maps/tools/CustomTileLayer'
 import { CustomZoomControl } from '../../../components/maps/tools/CustomZoomControl';
 import TILES from '../../../constants/mapTiles';
 import { baseUrls } from '../../../constants/urls';
-import { redirectTo, redirectToReplace } from '../../../routing/actions';
 import { RegistryDetailParams } from '../types';
 import { MapPopUp } from './MapPopUp';
 import { MapSettings, Settings } from './MapSettings';
 import { MapToolTip } from './MapTooltip';
+import { useRedirectTo, useRedirectToReplace } from '../../../routing/routing';
 
 type Props = {
     orgUnit: OrgUnit;
@@ -87,7 +86,8 @@ export const OrgUnitChildrenMap: FunctionComponent<Props> = ({
     params,
 }) => {
     const classes: Record<string, string> = useStyles();
-    const dispatch = useDispatch();
+    const redirectToReplace = useRedirectToReplace();
+    const redirectTo = useRedirectTo();
     const [settings, setSettings] = useState<Settings>({
         showTooltip: params.showTooltip === 'true',
         useCluster: params.useCluster === 'true',
@@ -131,6 +131,7 @@ export const OrgUnitChildrenMap: FunctionComponent<Props> = ({
             ),
         [activeChildren, isOrgUnitActive, orgUnit],
     );
+
     const handleChangeSettings = useCallback(
         (setting: string) => {
             const newSetting = !settings[setting];
@@ -140,36 +141,31 @@ export const OrgUnitChildrenMap: FunctionComponent<Props> = ({
                     [setting]: newSetting,
                 };
             });
-
-            dispatch(
-                redirectToReplace(baseUrls.registry, {
-                    ...params,
-                    [setting]: `${newSetting}`,
-                }),
-            );
+            redirectToReplace(baseUrls.registry, {
+                ...params,
+                [setting]: `${newSetting}`,
+            });
         },
-        [dispatch, params, settings],
+        [params, redirectToReplace, settings],
     );
 
     const handleToggleFullScreen = useCallback(
         (isFull: boolean) => {
             setIsMapFullScreen(isFull);
-            dispatch(
-                redirectToReplace(baseUrls.registry, {
-                    ...params,
-                    isFullScreen: `${isFull}`,
-                }),
-            );
+            redirectToReplace(baseUrls.registry, {
+                ...params,
+                isFullScreen: `${isFull}`,
+            });
         },
-        [dispatch, params],
+        [params, redirectToReplace],
     );
     const handleDoubleClick = useCallback(
         (event: L.LeafletMouseEvent, ou: OrgUnit) => {
             event.originalEvent.stopPropagation();
             const url = `/${baseUrls.registry}/orgUnitId/${ou?.id}`;
-            dispatch(redirectTo(url));
+            redirectTo(url);
         },
-        [dispatch],
+        [redirectTo],
     );
 
     const handleFeatureDoubleClick = useCallback(
