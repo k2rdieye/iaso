@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { paramsConfig } from '../../constants/urls';
+import { useParamsConfig } from '../routing';
 
 export const useParamsObject = (
     baseUrl: string,
 ): Record<string, string | Record<string, unknown> | undefined> => {
     const params = useParams()['*'] ?? '';
+    const configs = useParamsConfig();
     return useMemo(() => {
         const paramsList = params.split('/');
         // Even indexes are the params key
@@ -13,7 +14,7 @@ export const useParamsObject = (
         const paramsKeyIndexes = paramsList
             .map((_, index) => index)
             .filter(index => index % 2 === 0);
-        const paramsForUrl = paramsConfig[baseUrl];
+        const paramsForUrl = configs[baseUrl];
         const result = {};
         paramsForUrl.forEach(configParam => {
             const index = paramsList.findIndex(param => param === configParam);
@@ -29,5 +30,5 @@ export const useParamsObject = (
         });
 
         return result;
-    }, [baseUrl, params]);
+    }, [baseUrl, configs, params]);
 };
